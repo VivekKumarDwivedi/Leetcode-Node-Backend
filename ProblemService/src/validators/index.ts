@@ -46,3 +46,19 @@ export const validateRequestQuery = (schema: AnyZodObject) =>{
 }
 
 
+export const validateRequestParams = (schema: AnyZodObject) =>{
+    return async(req:Request, res:Response, next:NextFunction) => {
+        try{
+                await schema.parseAsync(req.params);
+                logger.info("Validation successful");
+                next();
+        }catch(error){
+            // if the validation fails
+            res.status(400).json({
+                message: "Invalid request params",
+                success: false,
+                error: error
+           });
+        }
+    }   
+}

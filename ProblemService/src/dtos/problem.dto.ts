@@ -4,7 +4,7 @@ export interface CreateProblemDto {
     title: string;
     description: string;
     difficulty: "easy" | "medium" | "hard";
-    editorial: string;
+    editorial: string | "";
     testcases: ITestcase[];
 }
 

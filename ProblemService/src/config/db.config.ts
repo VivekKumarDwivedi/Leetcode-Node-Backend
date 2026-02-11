@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
 import logger from "./logger.config";
-import { serverConfig } from ".";
+import { serverConfig } from "./index";
 
 
 export const connectDB = async () =>{
     try {
+        
         const dbUrl = serverConfig.DB_URL;
 
         await mongoose.connect(dbUrl);

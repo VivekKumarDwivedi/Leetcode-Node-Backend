@@ -52,7 +52,7 @@ export class ProblemService implements IProblemService {
         }
         const sanitizedPayload: Partial<IProblem> = {
             ...updateData
-        }
+        };
         if(updateData.description){
             description: updateData.description && await sanitizeMarkdown(updateData.description);
         }

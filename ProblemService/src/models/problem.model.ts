@@ -10,7 +10,7 @@ export interface IProblem extends Document {
     difficulty: "easy" | "medium" | "hard";
     createdAt: Date;
     updatedAt: Date;
-    editorial: string
+    editorial: string;
     testcases: ITestcase[];
 }
 
@@ -55,10 +55,8 @@ const problemSchema = new mongoose.Schema<IProblem>({
         trim: true,
     },
     testcases: [testSchema]
-},
-{
-    timestamps: true,
-});
+}
+);
 
 problemSchema.index({title: 1}, {unique: true}); //index on title for faster search and uniqueness
 problemSchema.index({difficulty: 1}); // index on difficulty for faster filtering
