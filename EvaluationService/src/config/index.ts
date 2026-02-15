@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 
 type ServerConfig={
 PORT:number,
-DB_URL:string,
 PROBLEM_SERVICE: string,
+SUBMISSION_SERVICE: string,
 };
  function loadEnv() {
   dotenv.config();
@@ -13,7 +13,7 @@ PROBLEM_SERVICE: string,
 loadEnv();
 
 export const serverConfig: ServerConfig = {
-  PORT: Number(process.env.PORT) || 3002,
-  DB_URL:process.env.DB_URL || "mongodb://localhost:27017/lc_submission_db",
-  PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3000/api/v1"
+  PORT: Number(process.env.PORT) || 3003,
+  PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3000/api/v1",
+  SUBMISSION_SERVICE: process.env.SUBMISSION_SERVICE || "http://localhost:3001/api/v1"
 };
