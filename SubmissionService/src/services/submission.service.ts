@@ -1,15 +1,15 @@
 import { getProblemById } from "../apis/problem.api";
 import logger from "../config/logger.config";
-import { ISubmission ,SubmissionStatus} from "../models/submisssion.model";
+import { SubmissionStatus, ISubmissionData} from "../models/submission.model";
 import { addSubmissionJob } from "../producers/submission.producer";
-import { ISubmissionRepository } from "../repositories/submission.repositoriy";
+import { ISubmissionRepository } from "../repositories/submission.repository";
 import { BadRequestError, NotFoundError } from "../utils/errors/app.error";
 export interface ISubmissionService {
-    createSubmission(submissionData: Partial<ISubmission>): Promise<ISubmission>;
-    getSubmissionById(id: string): Promise<ISubmission | null>;
-    getSubmissionsByProblemId(problemId: string): Promise<ISubmission[]>;
+    createSubmission(submissionData: Partial<ISubmissionData>): Promise<ISubmissionData>;
+    getSubmissionById(id: string): Promise<ISubmissionData | null>;
+    getSubmissionsByProblemId(problemId: string): Promise<ISubmissionData[]>;
     deleteSubmissionById(id: string): Promise<boolean>;
-    updateSubmissionStatus(id: string, status: SubmissionStatus): Promise<ISubmission | null>;
+    updateSubmissionStatus(id: string, status: SubmissionStatus,submissionData: ISubmissionData): Promise<ISubmissionData | null>;
 }
 
 export class SubmissionService implements ISubmissionService {
@@ -19,7 +19,7 @@ export class SubmissionService implements ISubmissionService {
         this.submissionRepository = submissionRepository;
     }
 
-    async createSubmission(submissionData: Partial<ISubmission>): Promise<ISubmission> {
+    async createSubmission(submissionData: Partial<ISubmissionData>): Promise<ISubmissionData> {
         // check if the problem exists
         if(!submissionData.problemId){
             throw new BadRequestError("Problem ID is required");
@@ -51,7 +51,7 @@ export class SubmissionService implements ISubmissionService {
         return submission;
     }
 
-    async getSubmissionById(id: string): Promise<ISubmission | null> {
+    async getSubmissionById(id: string): Promise<ISubmissionData | null> {
         const submission = await this.submissionRepository.findById(id);
         if(!submission){
             throw new NotFoundError("Submission not found");
@@ -59,7 +59,7 @@ export class SubmissionService implements ISubmissionService {
         return submission;
     }
 
-    async getSubmissionsByProblemId(problemId: string): Promise<ISubmission[]> {
+    async getSubmissionsByProblemId(problemId: string): Promise<ISubmissionData[]> {
         const submission = await this.submissionRepository.findByProblemId(problemId);
         return submission;
     }
@@ -72,8 +72,8 @@ export class SubmissionService implements ISubmissionService {
         return result;
     }
 
-    async updateSubmissionStatus(id: string, status: SubmissionStatus): Promise<ISubmission | null> {
-        const submission = await this.submissionRepository.updateStatus(id, status);
+    async updateSubmissionStatus(id: string, status: SubmissionStatus,submissionData: ISubmissionData): Promise<ISubmissionData | null> {
+        const submission = await this.submissionRepository.updateStatus(id, status,submissionData);
         if(!submission){
             throw new NotFoundError("Submission not found");
         }

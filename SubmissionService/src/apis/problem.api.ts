@@ -1,6 +1,6 @@
 import axios,{ AxiosResponse } from "axios";
 import { serverConfig } from "../config";
-import { InternalServerError } from "../utils/errors/app.error";
+import { InternalServerError,NotFoundError } from "../utils/errors/app.error";
 import logger from "../config/logger.config";
 
 export interface ITestCase{
@@ -35,8 +35,26 @@ export async function getProblemById(problemId: string): Promise<IProblemDetails
 
             throw new InternalServerError("Failed to get problem detail");
     } catch(error){
-        logger.error(`Failed to get problem details: ${error}`);
-        return null;
+   const url = `${serverConfig.PROBLEM_SERVICE}/problems/${problemId}`;
+    
+    // Type guard to check if error has expected properties
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorResponse = (error as any).response;
+    
+    logger.error(`Failed to get problem details. URL: ${url}`, {
+        error: errorMessage,
+        status: errorResponse?.status,
+        statusText: errorResponse?.statusText,
+        url: url
+    });
+    
+    if (errorResponse?.status === 404) {
+        throw new NotFoundError(`Problem not found: ${problemId}`);
+    } else if (errorResponse?.status >= 500) {
+        throw new InternalServerError(`Problem service unavailable: ${errorMessage}`);
+    } else {
+        throw new InternalServerError(`Failed to fetch problem: ${errorMessage}`);
+    }
     }
     
 }

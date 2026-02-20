@@ -1,121 +1,111 @@
 import { NextFunction, Request, Response } from "express";
 import logger from "../config/logger.config";
-import { BadRequestError } from "../utils/errors/app.error";
-import { SubmissionService } from "../services/submissions.service";
-import { SubmissionRepository } from "../repositories/submission.repositoriy";
+import { SubmissionService } from "../services/submission.service";
 
-const submissionRepository = new SubmissionRepository();
-const submissionService = new SubmissionService(submissionRepository);
+export class SubmissionController {
+    private submissionService: SubmissionService;
 
-export const SubmissionController = {
-  createSubmission: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      logger.info("Creating new submission", { body: req.body });
-      const submission = await submissionService.createSubmission(req.body);
-
-      logger.info("Submission created successfully", { submissionId: submission._id });
-
-      res.status(201).json({
-        success: true,
-        message: "Submission created successfully",
-        data: submission,
-      });
-    } catch (error) {
-      next(error);
+    constructor(submissionService: SubmissionService) {
+        this.submissionService = submissionService;
     }
-  },
 
-  getSubmissionById: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      
-      if (!id) {
-        throw new BadRequestError("Submission ID is required");
-      }
-      
-      logger.info("Getting submission by id", { submissionId: id });
-
-      const submission = await submissionService.getSubmissionById(id);
-
-      logger.info("Submission found successfully", { submissionId: id });
-
-      res.status(200).json({
-        success: true,
-        message: "Submission found successfully",
-        data: submission,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  getSubmissionByProblemId: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { problemId } = req.params;
+    createSubmission = async (req: Request, res: Response, next: NextFunction) => {
+        logger.info("Creating new submission", { body: req.body });
         
-    if (!problemId) {
-      throw new BadRequestError("Problem ID is required");
-    }
-    
-      logger.info("Getting submission by problem id", { problemId });
+        const submission = await this.submissionService.createSubmission(req.body);
+        if(!submission){
+            throw new Error("Submission creation failed");
+        }
+        logger.info("Submission created successfully", { submissionId: submission._id });
+        
+        res.status(201).json({
+            success: true,
+            message: "Submission created successfully",
+            data: submission
+        });
+    };
 
-      const submission = await submissionService.getSubmissionsByProblemId(problemId);
+    getSubmissionById = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        if(!id){
+            throw new Error("Submission ID is required");
+        }
+        logger.info("Fetching submission by ID", { submissionId: id });
+        
+        const submission = await this.submissionService.getSubmissionById(id);
+        
+        logger.info("Submission fetched successfully", { submissionId: id });
+        
+        res.status(200).json({
+            success: true,
+            message: "Submission fetched successfully",
+            data: submission
+        });
+    };
 
-      logger.info("Submission found successfully", {
-        submissionId: submission[0]?._id,
-        problemId,
-      });
+    getSubmissionsByProblemId = async (req: Request, res: Response, next: NextFunction) => {
+        const { problemId } = req.params;
+        if(!problemId){
+            throw new Error("Problem ID is required");
+        }
+        logger.info("Fetching submissions by problem ID", { problemId });
+        
+        const submissions = await this.submissionService.getSubmissionsByProblemId(problemId);
+        
+        logger.info("Submissions fetched successfully", { 
+            problemId, 
+            count: submissions.length 
+        });
+        
+        res.status(200).json({
+            success: true,
+            message: "Submissions fetched successfully",
+            data: submissions
+        });
+    };
 
-      res.status(200).json({
-        success: true,
-        message: "Submission found successfully",
-        data: submission,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
+    deleteSubmissionById = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+         if(!id){
+            throw new Error("Submission ID is required");
+         }
+        logger.info("Deleting submission", { submissionId: id });
+        
+        await this.submissionService.deleteSubmissionById(id);
+        
+        logger.info("Submission deleted successfully", { submissionId: id });
+        
+        res.status(200).json({
+            success: true,
+            message: "Submission deleted successfully"
+        });
+    };
 
-  deleteSubmissionById: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      
-      if (!id) {
-        throw new BadRequestError("Submission ID is required");
-      }
-
-      logger.info("Deleting submission by id", { submissionId: id });
-
-      const result = await submissionService.deleteSubmissionById(id);
-
-      res.status(200).json({
-        success: true,
-        message: "Submission deleted successfully",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-
-  updateSubmissionStatus: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
-
-      if (!id || !status) throw new BadRequestError("Submission id and status are required");
-
-      logger.info("Updating submission status", { submissionId: id, status });
-
-      const result = await submissionService.updateSubmissionStatus(id, status);
-
-      res.status(200).json({
-        success: true,
-        message: "Submission status updated successfully",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-};
+    updateSubmissionStatus = async (req: Request, res: Response, next: NextFunction) => {
+        const { id } = req.params;
+        const { status, submissionData } = req.body;
+        
+        if(!id){
+            throw new Error("Submission ID is required");
+        }
+        
+        logger.info("Updating submission status", { 
+            submissionId: id, 
+            status ,
+            submissionData
+        });
+        
+        const submission = await this.submissionService.updateSubmissionStatus(id, status, submissionData);
+        
+        logger.info("Submission status updated successfully", { 
+            submissionId: id, 
+            status 
+        });
+        
+        res.status(200).json({
+            success: true,
+            message: "Submission status updated successfully",
+            data: submission
+        });
+    };
+}

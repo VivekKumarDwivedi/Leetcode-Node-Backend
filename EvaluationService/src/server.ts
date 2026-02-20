@@ -5,6 +5,7 @@ import v2Router from "./routers/v2/index.router";
 import { genericErrorHandler } from './middlewares/error.middleware';
 import logger from './config/logger.config';
 import {  attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
+import { startWorkers } from './workers/evaluation.worker';
 const app = express();
 
 app.use(express.json());
@@ -22,7 +23,9 @@ app.use('/api/v2', v2Router); // just for testing purpose we are using v1 router
  * registering error middleware
  */
 app.use(genericErrorHandler);
-app.listen(serverConfig.PORT, () => {
+app.listen(serverConfig.PORT, async () => {
   logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
   logger.info(`Press Ctrl+C to stop the server`);
+  await startWorkers();
+  logger.info(`Evaluation worker started`);
 });

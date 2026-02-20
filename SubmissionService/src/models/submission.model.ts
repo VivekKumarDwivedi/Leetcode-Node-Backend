@@ -14,7 +14,7 @@ export enum SubmissionLanguage {
     JAVA = "java",
     JAVASCRIPT = "javascript"    
 }
-export interface ISubmission extends Document {
+export interface ISubmissionData extends Document {
     problemId: string;
     code: string;
     language: SubmissionLanguage;
@@ -23,7 +23,7 @@ export interface ISubmission extends Document {
     updatedAt: Date;
 }
 
-const submissionSchema = new Schema<ISubmission>({
+const submissionSchema = new Schema<ISubmissionData>({
     problemId: {
          type: String, 
          required: [true, "Problem Id required for the submission"]
@@ -48,4 +48,4 @@ const submissionSchema = new Schema<ISubmission>({
 });
 
 submissionSchema.index({status:1, createdAt:-1})
-export const Submission = model<ISubmission>("Submission",submissionSchema);
+export const Submission = model<ISubmissionData>("Submission",submissionSchema);
