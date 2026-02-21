@@ -7,6 +7,7 @@ import logger from './config/logger.config';
 import {  attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import { startWorkers } from './workers/evaluation.worker';
 import { pullAllImages } from './utils/containers/pullimage.util';
+
 const app = express();
 
 app.use(express.json());
