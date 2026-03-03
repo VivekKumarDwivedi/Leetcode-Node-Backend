@@ -1,5 +1,4 @@
 import {createNewDockerContainer} from "./createContainer.util";
-import {PYTHON_IMAGE} from "../constants";
 import { commands } from "./commands.util";
 import { InternalServerError } from "../errors/app.error";
 
@@ -8,15 +7,16 @@ export interface CodeRunnerOptions {
     code:string;
     language: "python" | "cpp";
     timeout:number;
+    imageName:string;
 }
 export async function runCode(options:CodeRunnerOptions){
-    const {code,language,timeout} = options;
+    const {code,language,timeout,imageName} = options;
    
     if(!allowedLanguages.includes(language)){
         throw new InternalServerError(`invaild language ${language}`);
     }
     const container = await createNewDockerContainer({
-    imageName:PYTHON_IMAGE,
+    imageName:imageName,
     cmdExecutable:commands[language](code),
     memoryLimit:1024*1024*1024, // 1GB
     });
@@ -38,7 +38,7 @@ export async function runCode(options:CodeRunnerOptions){
     stderr:true
     });
 
-    console.log("Container logs",logs?.toString());
+    console.log("Container logs",logs?.toString().trim());
 
     await container?.remove();
 
