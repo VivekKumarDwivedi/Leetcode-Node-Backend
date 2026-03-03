@@ -7,7 +7,7 @@ import logger from './config/logger.config';
 import {  attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import { startWorkers } from './workers/evaluation.worker';
 import { pullAllImages } from './utils/containers/pullimage.util';
-import { runPythonCode } from './utils/containers/pythonRunner.utils';
+import { runCode } from './utils/containers/codeRunner.util';
 const app = express();
 
 app.use(express.json());
@@ -40,5 +40,9 @@ app.listen(serverConfig.PORT, async () => {
 async function testPyThonCode(){
   const pythonCode = `print("Hello world")`;
   // take the python code dump in the file ansd run the pyrhon file in the docker container
-  await runPythonCode(pythonCode);
+  await runCode({
+    code:pythonCode,
+    language:"python",
+    timeout:5000
+  });
 }
