@@ -8,16 +8,17 @@ export interface CodeRunnerOptions {
     language: "python" | "cpp";
     timeout:number;
     imageName:string;
+    input:string;
 }
 export async function runCode(options:CodeRunnerOptions){
-    const {code,language,timeout,imageName} = options;
+    const {code,language,timeout,imageName,input} = options;
    
     if(!allowedLanguages.includes(language)){
         throw new InternalServerError(`invaild language ${language}`);
     }
     const container = await createNewDockerContainer({
     imageName:imageName,
-    cmdExecutable:commands[language](code),
+    cmdExecutable:commands[language](code,input),
     memoryLimit:1024*1024*1024, // 1GB
     });
 
@@ -39,6 +40,9 @@ export async function runCode(options:CodeRunnerOptions){
     });
 
     console.log("Container logs",logs?.toString().trim());
+    
+    const containerLogs = processLogs(logs);
+    console.log("container logs",containerLogs);
 
     await container?.remove();
 
@@ -49,4 +53,11 @@ export async function runCode(options:CodeRunnerOptions){
     } else {
         console.log("Container exited with error")
     }
+}
+
+function processLogs(logs: Buffer | undefined){
+    return logs?.toString("utf8")
+    .replace(/\x00/g, '') // remove null bytes
+    .replace(/[\x00-\x09\x0B-\x1F\x7F-\x9F]/g, '') // remove other control characters
+    .trim();
 }

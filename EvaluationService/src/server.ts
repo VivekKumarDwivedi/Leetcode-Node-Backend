@@ -46,20 +46,24 @@ async function testPyThonCode(){
     code:pythonCode,
     language:"python",
     timeout:5000,
-    imageName:PYTHON_IMAGE
+    imageName:PYTHON_IMAGE,
+    input:"6"
   });
 }
 
 async function testCppCode(){
   const cppCode = `#include <iostream>
   int main(){
-    std::cout << "Hello world" << std::endl;
+    int n;
+    std::cin>>n;
+    std::cout<<n*n<<std::endl;
     return 0;
   }`;
   await runCode({
     code:cppCode,
     language:"cpp",
     timeout:5000,
-    imageName:CPP_IMAGE
+    imageName:CPP_IMAGE,
+    input:"7"
   });
 }
