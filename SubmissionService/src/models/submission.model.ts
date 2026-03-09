@@ -2,10 +2,7 @@ import { Document ,Schema, model} from "mongoose";
 
 export enum SubmissionStatus {
     PENDING = "pending",
-    COMPILING = "compiling",
-    RUNNING = "running",
-    ACCEPTED = "accepted",
-    WRONG_ANSWER = "wrong_answer"
+    COMPLETED = "completed"
 }
 
 export enum SubmissionLanguage {
@@ -14,11 +11,16 @@ export enum SubmissionLanguage {
     JAVA = "java",
     JAVASCRIPT = "javascript"    
 }
+export interface ISubmissionData{
+    testCases: string;
+    status:SubmissionStatus;
+}
 export interface ISubmissionData extends Document {
     problemId: string;
     code: string;
     language: SubmissionLanguage;
     status:SubmissionStatus;
+    submissionData: ISubmissionData;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -43,6 +45,11 @@ const submissionSchema = new Schema<ISubmissionData>({
         default: SubmissionStatus.PENDING,
         enum:Object.values(SubmissionStatus)
      },
+     submissionData: {
+        type: Object,
+        required: true,
+        default: {}
+     }
    },{
     timestamps:true,
 });

@@ -7,8 +7,8 @@ import logger from './config/logger.config';
 import {  attachCorrelationIdMiddleware } from './middlewares/correlation.middleware';
 import { startWorkers } from './workers/evaluation.worker';
 import { pullAllImages } from './utils/containers/pullimage.util';
-import { runCode } from './utils/containers/codeRunner.util';
-import { PYTHON_IMAGE,CPP_IMAGE } from './utils/containers/../constants';
+// import { runCode } from './utils/containers/codeRunner.util';
+// import { PYTHON_IMAGE,CPP_IMAGE } from './utils/containers/../constants';
 const app = express();
 
 app.use(express.json());
@@ -35,35 +35,35 @@ app.listen(serverConfig.PORT, async () => {
   await pullAllImages();
   console.log("Image pulled successfully");
 
-  await testPyThonCode();
-  await testCppCode();
+  // await testPyThonCode();
+  // await testCppCode();
 });
 
-async function testPyThonCode(){
-  const pythonCode = `print("Hello world")`;
-  // take the python code dump in the file ansd run the pyrhon file in the docker container
-  await runCode({
-    code:pythonCode,
-    language:"python",
-    timeout:5000,
-    imageName:PYTHON_IMAGE,
-    input:"6"
-  });
-}
+// async function testPyThonCode(){
+//   const pythonCode = `print("Hello world")`;
+//   // take the python code dump in the file ansd run the pyrhon file in the docker container
+//   await runCode({
+//     code:pythonCode,
+//     language:"python",
+//     timeout:5000,
+//     imageName:PYTHON_IMAGE,
+//     input:"6"
+//   });
+// }
 
-async function testCppCode(){
-  const cppCode = `#include <iostream>
-  int main(){
-    int n;
-    std::cin>>n;
-    std::cout<<n*n<<std::endl;
-    return 0;
-  }`;
-  await runCode({
-    code:cppCode,
-    language:"cpp",
-    timeout:5000,
-    imageName:CPP_IMAGE,
-    input:"7"
-  });
-}
+// async function testCppCode(){
+//   const cppCode = `#include <iostream>
+//   int main(){
+//     int n;
+//     std::cin>>n;
+//     std::cout<<n*n<<std::endl;
+//     return 0;
+//   }`;
+//   await runCode({
+//     code:cppCode,
+//     language:"cpp",
+//     timeout:5000,
+//     imageName:CPP_IMAGE,
+//     input:"7"
+//   });
+// }
