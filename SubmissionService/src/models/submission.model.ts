@@ -11,7 +11,7 @@ export enum SubmissionLanguage {
     JAVA = "java",
     JAVASCRIPT = "javascript"    
 }
-export interface ISubmissionData{
+export interface ISubmissionDataResult{
     testCases: string;
     status:SubmissionStatus;
 }
@@ -20,7 +20,7 @@ export interface ISubmissionData extends Document {
     code: string;
     language: SubmissionLanguage;
     status:SubmissionStatus;
-    submissionData: ISubmissionData;
+    submissionData: ISubmissionDataResult;
     createdAt: Date;
     updatedAt: Date;
 }
